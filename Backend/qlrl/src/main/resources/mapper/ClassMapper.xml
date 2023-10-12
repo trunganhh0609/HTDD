@@ -1,0 +1,34 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.qlrl.repository.ClassRepository">
+
+    <select id="getClassByTeacher" parameterType="map" resultType="map">
+        SELECT
+        DISTINCT user_class.CLASS_ID as classId,
+        class.CLASS_CODE as classCode,
+        class.CLASS_NAME as className,
+        class.START_DATE as startDate,
+        class.END_DATE as endDate
+        FROM user_class
+        JOIN class ON class.CLASS_ID = user_class.CLASS_ID
+        JOIN user ON user_class.USER_ID = user_class.USER_ID
+        WHERE user.USER_ID = #{uid}
+        AND user.ROLE_ID = #{teacherRole}
+    </select>
+
+    <select id="getStudentInClass" resultType="map" parameterType="map">
+        SELECT
+        user.USER_ID AS userId,
+        user.USER_NAME AS userName,
+        user.NAME AS name,
+        user.BIRTH_DATE AS birthDate,
+        user.GENDER AS gender,
+        user.EMAIL AS email
+        FROM user
+        LEFT JOIN user_class ON user.USER_ID = user_class.USER_ID
+        WHERE user.ROLE_ID = #{studentRole}
+        AND user_class.CLASS_ID = #{classId}
+    </select>
+
+</mapper>

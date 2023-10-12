@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.qlrl.repository.PointRepository">
+
+    <insert id="addPoint" parameterType="map">
+        INSERT INTO point (USER_ID, CLASS_ID, SUBJECT_ID, POINT) VALUES
+        (#{Ma_sv}, #{idClass}, #{idSubject}, #{point});
+    </insert>
+
+    <select id="getPoint" parameterType="map" resultType="map">
+        SELECT * FROM point
+        WHERE CLASS_ID = #{idClass}
+        AND SUBJECT_ID = #{idSubject}
+    </select>
+
+</mapper>
