@@ -40,4 +40,8 @@ public interface UserRepos {
     List<Map<Object,Object>> statisticalPoint(Map param);
 
     Map<Object,Object> getUserInfoByEmail(String email);
+
+    int checkUserNameExist (String userName);
+
+    int checkEmailExist(String email);
 }

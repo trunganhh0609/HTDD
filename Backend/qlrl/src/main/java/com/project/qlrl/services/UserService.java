@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -31,8 +33,10 @@ public class UserService {
         Map<Object,Object> result = new HashMap<>();
         try{
             result.put("data", userRepos.searchUser(param));
+            result.put("status", true);
         }catch (Exception e){
             e.printStackTrace();
+            result.put("status", false);
             result.put("error", "error");
         }
         return result;
@@ -61,23 +65,38 @@ public class UserService {
     public Map<Object,Object> addUser(Map param){
         Map<Object,Object> result = new HashMap<>();
         try {
+
+            if(userRepos.checkUserNameExist(param.get("userName").toString()) > 0){
+                result.put("userName", true);
+                return result;
+            }
+            if (userRepos.checkEmailExist(param.get("email").toString()) > 0){
+                result.put("email", true);
+                return result;
+            }
+
             User user = new User();
             user.setUserName(param.get("userName").toString());
             user.setName(param.get("fullName").toString());
             user.setGender(param.get("gender").toString().equals("true")? true: false);
             user.setPassword(passwordEncoder.encode(param.get("password").toString()));
-            user.setBirthDate(param.get("dob").toString());
+            String pattern = "yyyy-MM-dd";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            String dob = simpleDateFormat.format(new Date(param.get("dob").toString()));
+            user.setBirthDate(dob);
             user.setRole(param.get("role").toString());
             user.setEmail(param.get("email").toString());
             user.setEmailVerifyKey(TOTPUtils.generateSecretKey());
 
-            if(param.get("classId") == null){
-                result.put("success", userRepos.addUser(user));
-            }else{
-                userRepos.addUser(user);
-                param.put("userId", user.getId());
-                result.put("success", userRepos.addUserToClass(param));
-            }
+            result.put("success", userRepos.addUser(user));
+            result.put("status", true);
+//            if(param.get("classId") == null){
+//                result.put("success", userRepos.addUser(user));
+//            }else{
+//                userRepos.addUser(user);
+//                param.put("userId", user.getId());
+//                result.put("success", userRepos.addUserToClass(param));
+//            }
         }catch (Exception e){
             e.printStackTrace();
             result.put("error", "error");
@@ -92,15 +111,16 @@ public class UserService {
             if(param.get("password") != null){
                 param.put("pwd", passwordEncoder.encode(param.get("password").toString()));
             }
-            if(param.get("classId") == null){
-                result.put("success", userRepos.updateUser(param));
-            }else{
-                userRepos.updateUser(param);
-                result.put("success",userRepos.updateUserClass(param));
-            }
+            String pattern = "yyyy-MM-dd";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            String dob = simpleDateFormat.format(new Date(param.get("dob").toString()));
+            param.put("dob", dob);
+            userRepos.updateUser(param);
+            result.put("status", true);
         }catch (Exception e){
             e.printStackTrace();
             result.put("error", "error");
+            result.put("status", false);
         }
         return result;
     }
@@ -108,10 +128,13 @@ public class UserService {
     public Map<Object,Object> deleteUser(Map param){
         Map<Object,Object> result = new HashMap<>();
         try {
-            result.put("success", userRepos.deleteUser(param));
+            userRepos.deleteUser(param);
+            result.put("status", true);
+
         }catch (Exception e){
             e.printStackTrace();
             result.put("error", "error");
+            result.put("status", false);
         }
         return result;
     }

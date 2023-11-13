@@ -9,25 +9,20 @@
 
     <select resultType="map" id="searchUser" parameterType="map">
         SELECT
-        user.USER_ID,
-        user.USER_NAME,
-        user.NAME,
-        user.BIRTH_DATE,
-        user.GENDER,
-        role.ROLE_ID,
-        role.ROLE_NAME,
-        class.CLASS_ID,
-        user_class.UC_ID,
-        department.DEPT_NAME
-        FROM user INNER JOIN role ON user.ROLE_ID = role.ROLE_ID
-        LEFT JOIN user_class ON user_class.USER_ID = user.USER_ID
-        LEFT JOIN class ON class.CLASS_ID = user_class.CLASS_ID
-        WHERE
-        user.USER_NAME LIKE CONCAT('%', #{userName}, '%')
-        AND user.NAME LIKE CONCAT('%', #{fullName}, '%')
-        <if test="roleId != null and roleId != ''">
-            AND role.ROLE_ID = #{roleId}
-        </if>
+        user.USER_ID as userId,
+        user.USER_NAME as userName,
+        user.NAME as fullName,
+        user.BIRTH_DATE as birthDate,
+        user.EMAIL as email,
+        user.GENDER as gender,
+        user.ROLE_ID as roleId
+        FROM user
+<!--        WHERE-->
+<!--        user.USER_NAME LIKE CONCAT('%', #{userName}, '%')-->
+<!--        AND user.NAME LIKE CONCAT('%', #{fullName}, '%')-->
+<!--        <if test="roleId != null and roleId != ''">-->
+<!--            AND role.ROLE_ID = #{roleId}-->
+<!--        </if>-->
 
     </select>
 
@@ -47,8 +42,7 @@
         user.BIRTH_DATE,
         user.ROLE_ID AS ROLE,
         class.CLASS_NAME,
-        class.CLASS_ID,
-        user.EMAIL_VERIFY_KEY
+        class.CLASS_ID
         FROM user
         LEFT JOIN user_class ON user.USER_ID = user_class.USER_ID
         LEFT JOIN class ON user_class.CLASS_ID = class.CLASS_ID
@@ -60,7 +54,7 @@
         user.USER_ID,
         user.NAME,
         user.BIRTH_DATE,
-        user.ROLE_ID AS ROLE,
+        user.ROLE_ID AS ROLE
         FROM user
         WHERE USER_NAME = #{userName}
     </select>
@@ -75,7 +69,6 @@
         <if test="email != null and email != ''">
             `EMAIL`,
         </if>
-        `EMAIL_VERIFY_KEY`,
         `ROLE_ID`)
         VALUES (
         #{USER_NAME},
@@ -83,13 +76,9 @@
         #{name},
         #{birthDate},
         #{gender},
-        <if test="deptId != null and deptId != ''">
-            #{deptId},
-        </if>
         <if test="email != null and email != ''">
             #{email},
         </if>
-        #{emailVerifyKey},
         #{ROLE_ID});
     </insert>
 
@@ -107,6 +96,9 @@
         <if test="pwd != null and pwd!= ''">
             `PASSWORD`= #{pwd},
         </if>
+        <if test="email != null and email!= ''">
+            `EMAIL`= #{email},
+        </if>
         <if test="dob != null and dob!= ''">
             `BIRTH_DATE`= #{dob},
         </if>
@@ -114,7 +106,7 @@
         <if test="role != null and role != ''">
             `ROLE_ID`= #{role}
         </if>
-        WHERE  `USER_ID`= #{userId};
+        WHERE  `USER_NAME`= #{userName};
     </update>
 
     <update id="updateUserClass" parameterType="map">
@@ -125,7 +117,7 @@
 
     <delete id="deleteUser" parameterType="map">
         DELETE FROM user
-        WHERE  `USER_ID` = #{userId};
+        WHERE  `USER_NAME` = #{userName};
     </delete>
 
     <update id="changePassword" parameterType="map">
@@ -155,12 +147,19 @@
         user.BIRTH_DATE,
         user.ROLE_ID AS ROLE,
         class.CLASS_NAME,
-        class.CLASS_ID,
-        user.EMAIL_VERIFY_KEY
+        class.CLASS_ID
         FROM user
         LEFT JOIN user_class ON user.USER_ID = user_class.USER_ID
         LEFT JOIN class ON user_class.CLASS_ID = class.CLASS_ID
         WHERE EMAIL = #{email}
+    </select>
+
+    <select id="checkUserNameExist" parameterType="string" resultType="integer">
+        SELECT COUNT(*) FROM user WHERE USER_NAME = #{userName}
+    </select>
+
+    <select id="checkEmailExist" parameterType="string" resultType="integer">
+        SELECT COUNT(*) FROM user WHERE EMAIL = #{email}
     </select>
 
 </mapper>

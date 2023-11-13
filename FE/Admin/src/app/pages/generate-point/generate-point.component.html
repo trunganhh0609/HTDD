@@ -1,0 +1,35 @@
+
+<div class="container-fluid">
+  <!-- <app-page-title title="Điểm danh" [breadcrumbItems="dsfsd"></app-page-title> -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h2>Tính điểm chuyên cần</h2>
+          <p-table [value]="lstClass" [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+            [rowHover]="true">
+            <ng-template pTemplate="header">
+                <tr >
+                  <th>#</th>
+                  <th>Tên lớp</th>
+                  <th>Tên môn</th>
+                  <th>Học kỳ</th>
+                  <th>Năm học</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-i="rowIndex">
+                <tr (dblclick)="listStudent(item)" style="cursor: pointer;">
+                  <td> {{ i+1 }} </td>
+                  <td>{{ item.Ten_lop }}</td>
+                  <td>{{ item.Ten_mon }}</td>
+                  <td>{{ item.Hoc_ky }}</td>
+                  <td>{{ item.Nam_hoc }}</td>
+                </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

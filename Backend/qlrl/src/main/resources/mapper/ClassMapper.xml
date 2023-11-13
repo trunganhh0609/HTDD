@@ -31,4 +31,53 @@
         AND user_class.CLASS_ID = #{classId}
     </select>
 
+    <select id="getListClass" resultType="map">
+        SELECT
+        class.CLASS_ID as classId,
+        class.CLASS_CODE as classCode,
+        class.CLASS_NAME as className,
+        user.USER_ID as teacherId,
+        user.NAME as teacherName
+        FROM class
+        INNER JOIN user_class ON class.CLASS_ID = user_class.CLASS_ID
+        INNER JOIN user ON user.USER_ID = user_class.USER_ID
+        WHERE user.ROLE_ID = 'ROLE002'
+    </select>
+
+    <select id="searchTeacher" parameterType="String" resultType="map">
+        SELECT
+        NAME as teacherName,
+        USER_NAME as userName,
+        USER_ID as userId
+        FROM user
+        WHERE user.NAME LIKE CONCAT('%', #{keySearch}, '%')
+        AND ROLE_ID = 'ROLE002'
+    </select>
+
+    <insert id="addClass" parameterType="map" useGeneratedKeys="true" keyColumn="CLASS_ID" keyProperty="classId">
+        INSERT INTO class
+        (
+        CLASS_CODE,
+        CLASS_NAME
+        )
+        VALUES
+        (
+        #{classCode},
+        #{className}
+        )
+    </insert>
+
+    <insert id="addTeacherInClass" parameterType="map">
+        INSERT INTO user_class
+        (
+        CLASS_ID,
+        USER_ID
+        )
+        VALUES
+        (
+        #{classId},
+        #{teacherId}
+        )
+    </insert>
+
 </mapper>

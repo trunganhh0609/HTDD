@@ -5,6 +5,7 @@ import com.project.qlrl.repository.AttendanceRepository;
 import com.project.qlrl.repository.ClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,5 +47,45 @@ public class ClassService {
             }
         }
         return lstStudent;
+    }
+
+    public Map<Object, Object> getListClass(){
+        Map<Object,Object> result = new HashMap<>();
+        try{
+            result.put("responseData", classRepository.getListClass());
+            result.put("status", true);
+        }catch (Exception e){
+            e.printStackTrace();
+            result.put("status", false);
+        }
+        return result;
+    }
+
+    public Map<Object,Object> searchTeacher(String keySearch){
+        Map<Object,Object> result = new HashMap<>();
+        try {
+            result.put("data", classRepository.searchTeacher(keySearch));
+            result.put("status", true);
+        }catch (Exception e){
+            e.printStackTrace();
+            result.put("status", false);
+            result.put("error", "error");
+        }
+        return result;
+    }
+
+    @Transactional
+    public Map<Object,Object> addClass(Map<Object,Object> param){
+        Map<Object,Object> result = new HashMap<>();
+        try {
+            classRepository.addClass(param);
+            classRepository.addTeacherInClass(param);
+            result.put("status", true);
+        }catch (Exception e){
+            e.printStackTrace();
+            result.put("status", false);
+            result.put("error", "error");
+        }
+        return result;
     }
 }
